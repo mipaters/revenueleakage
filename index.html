@@ -21,21 +21,21 @@
         </div>
 
         <nav class="main-nav" aria-label="Main navigation">
-          <button class="nav-link active">Executive</button>
-          <button class="nav-link">Dashboard</button>
-          <button class="nav-link">Investigations</button>
-          <button class="nav-link">Recovery</button>
-          <button class="nav-link">Architecture</button>
+          <button class="nav-link active" data-target="executive" aria-current="page">Executive</button>
+          <button class="nav-link" data-target="leakageDashboard">Dashboard</button>
+          <button class="nav-link" data-target="investigationWorkspace">Investigations</button>
+          <button class="nav-link" data-target="recoveryCenter">Recovery</button>
+          <button class="nav-link" data-target="solutionArchitecture">Architecture</button>
         </nav>
 
         <div class="top-actions">
           <button id="themeToggle" class="secondary-btn" aria-label="Toggle theme">Light mode</button>
-          <button id="demoToggle" class="primary-btn">Executive Demo Walkthrough</button>
+          <button id="demoToggle" class="primary-btn" aria-expanded="false" aria-controls="walkthroughSection">Executive Demo Walkthrough</button>
         </div>
       </header>
 
       <main>
-        <section class="hero panel">
+        <section id="executive" class="hero panel">
           <div class="hero-copy">
             <span class="kicker">AI-powered telecom revenue assurance</span>
             <h2>Protecting revenue before it leaks.</h2>
@@ -44,8 +44,8 @@
               network, partner, and customer operations with a collaborative AI command center.
             </p>
             <div class="hero-actions">
-              <button class="primary-btn">Launch operations</button>
-              <button class="secondary-btn">Review AI playbook</button>
+              <button id="launchOperations" class="primary-btn">Launch operations</button>
+              <button class="secondary-btn playbook-trigger">Review AI playbook</button>
             </div>
             <div class="hero-summary" aria-label="Financial summary">
               <div>
@@ -154,19 +154,19 @@
             <span class="section-kicker">AI agents</span>
             <h3>Five collaborative revenue intelligence agents</h3>
           </div>
-          <button class="secondary-btn small">View agent playbook</button>
+          <button class="secondary-btn small playbook-trigger">View agent playbook</button>
         </section>
 
         <section id="agentGrid" class="agent-grid" aria-live="polite"></section>
 
-        <section class="two-column-layout dashboard-layout">
+        <section id="leakageDashboard" class="two-column-layout dashboard-layout">
           <div class="panel">
             <div class="panel-heading">
               <div>
                 <span class="section-kicker">Live monitoring</span>
                 <h3>Revenue Leakage Dashboard</h3>
               </div>
-              <button class="ghost-btn">Export view</button>
+              <button id="exportView" class="ghost-btn">Export view</button>
             </div>
 
             <table class="leak-table">
@@ -183,7 +183,7 @@
             </table>
           </div>
 
-          <aside class="panel detail-panel">
+          <aside id="investigationWorkspace" class="panel detail-panel">
             <div class="panel-heading compact">
               <div>
                 <span class="section-kicker">Investigation</span>
@@ -192,6 +192,17 @@
             </div>
             <div id="leakDetails" class="leak-details"></div>
           </aside>
+        </section>
+
+        <section id="recoveryCenter" class="panel recovery-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">Recovery &amp; remediation</span>
+              <h3>Revenue recovery work queue</h3>
+            </div>
+            <span id="recoverySummary" class="queue-summary" aria-live="polite"></span>
+          </div>
+          <div id="recoveryQueue" class="recovery-queue"></div>
         </section>
 
         <section id="walkthroughSection" class="panel walkthrough hidden">
@@ -207,7 +218,7 @@
           <div id="scenarioDetail" class="scenario-detail" aria-live="polite"></div>
         </section>
 
-        <section class="panel architecture-panel">
+        <section id="solutionArchitecture" class="panel architecture-panel">
           <div class="panel-heading">
             <div>
               <span class="section-kicker">Solution architecture</span>
@@ -263,6 +274,19 @@
         </section>
       </main>
     </div>
+
+    <dialog id="playbookDialog" class="playbook-dialog" aria-labelledby="playbookTitle">
+      <div class="dialog-heading">
+        <div>
+          <span class="section-kicker">Agent collaboration</span>
+          <h2 id="playbookTitle">Revenue assurance playbook</h2>
+        </div>
+        <button id="closePlaybook" class="icon-button" aria-label="Close playbook">×</button>
+      </div>
+      <p class="dialog-intro">A coordinated, evidence-led workflow turns a data signal into a verified and tracked recovery.</p>
+      <div id="playbookContent" class="playbook-content"></div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script src="script.js"></script>
   </body>

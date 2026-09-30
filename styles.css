@@ -38,6 +38,11 @@ html {
   scroll-behavior: smooth;
 }
 
+section[id],
+aside[id] {
+  scroll-margin-top: 112px;
+}
+
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
@@ -759,6 +764,189 @@ main {
   color: var(--text);
 }
 
+.recovery-panel {
+  padding: 4px 0 22px;
+}
+
+.queue-summary {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.recovery-queue {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 20px;
+}
+
+.recovery-card {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+}
+
+.recovery-card.resolved {
+  opacity: 0.78;
+}
+
+.recovery-card-heading,
+.recovery-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.case-id,
+.assigned-label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.recovery-card h4 {
+  margin: 15px 0 6px;
+  font-size: 1.08rem;
+}
+
+.recovery-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.recovery-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.recovery-meta span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.recovery-meta strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.recovery-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.playbook-dialog {
+  width: min(720px, calc(100vw - 32px));
+  max-height: min(82vh, 760px);
+  padding: 26px;
+  overflow: auto;
+  color: var(--text);
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--card-shadow);
+}
+
+.playbook-dialog::backdrop {
+  background: rgba(3, 11, 18, 0.72);
+  backdrop-filter: blur(5px);
+}
+
+.dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dialog-heading h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.icon-button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  color: var(--text);
+  font-size: 1.5rem;
+}
+
+.dialog-intro {
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 16px 0 20px;
+}
+
+.playbook-content {
+  display: grid;
+  gap: 12px;
+}
+
+.playbook-step {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.playbook-step-number {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.playbook-step h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.playbook-step p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 8px;
+}
+
+.playbook-output {
+  color: var(--success);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-panel);
+  color: var(--text);
+  box-shadow: var(--card-shadow);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 @media (max-width: 1100px) {
   .topbar {
     flex-wrap: wrap;
@@ -804,6 +992,7 @@ main {
   .kpi-grid,
   .agent-grid,
   .scenario-grid,
+  .recovery-queue,
   .source-grid,
   .score-row,
   .scenario-metrics {
@@ -817,5 +1006,9 @@ main {
   .brand {
     width: 100%;
     justify-content: center;
+  }
+
+  .recovery-meta {
+    grid-template-columns: 1fr;
   }
 }

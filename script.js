@@ -105,6 +105,13 @@ const technologyStack = [
   'Microsoft Purview'
 ];
 
+const recoveryCases = [
+  { id: 'RC-1042', issue: 'Unbilled fiber service', customer: 'Northstar Health Group', impact: 182000, team: 'Billing Ops', sla: '4h remaining', status: 'Ready to assign', owner: '' },
+  { id: 'RC-1038', issue: 'Enterprise invoice gap', customer: 'Meridian Logistics', impact: 246000, team: 'Finance', sla: '1 day remaining', status: 'In progress', owner: 'J. Chen' },
+  { id: 'RC-1029', issue: 'Mobile provisioning drift', customer: 'Pinecrest Wireless', impact: 96000, team: 'Network Ops', sla: 'At risk', status: 'Ready to assign', owner: '' },
+  { id: 'RC-1016', issue: 'Expired discount recovery', customer: '7,420 consumer accounts', impact: 890000, team: 'Product', sla: 'Resolved', status: 'Resolved', owner: 'A. Patel' }
+];
+
 const scenarios = [
   {
     id: 1,
@@ -240,11 +247,21 @@ function renderLeakTable() {
     .join('');
 
   tbody.querySelectorAll('tr').forEach((row) => {
-    row.addEventListener('click', () => {
+    const selectLeak = () => {
       tbody.querySelectorAll('tr').forEach((node) => node.classList.remove('active'));
       row.classList.add('active');
       renderLeakDetail(leakData[Number(row.dataset.index)]);
+    };
+    row.addEventListener('click', selectLeak);
+    row.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectLeak();
+      }
     });
+    row.tabIndex = 0;
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-label', `View investigation for ${leakData[Number(row.dataset.index)].title}`);
   });
 
   renderLeakDetail(leakData[0]);
@@ -328,9 +345,132 @@ function renderTechnologyStack() {
   container.innerHTML = technologyStack.map((item) => `<span class="tech-chip">${item}</span>`).join('');
 }
 
+function renderRecoveryQueue() {
+  const queue = document.getElementById('recoveryQueue');
+  const openCases = recoveryCases.filter((item) => item.status !== 'Resolved').length;
+  const recoveredAmount = recoveryCases
+    .filter((item) => item.status === 'Resolved')
+    .reduce((total, item) => total + item.impact, 0);
+
+  document.getElementById('recoverySummary').textContent =
+    `${openCases} open · ${formatCurrency(recoveredAmount)} recovered`;
+
+  queue.innerHTML = recoveryCases.map((item) => `
+    <article class="recovery-card ${item.status === 'Resolved' ? 'resolved' : ''}">
+      <div class="recovery-card-heading">
+        <span class="case-id">${item.id}</span>
+        <span class="status-pill ${item.status === 'Resolved' ? 'recovering' : item.sla === 'At risk' ? 'critical' : 'watch'}">${item.status}</span>
+      </div>
+      <h4>${item.issue}</h4>
+      <p>${item.customer}</p>
+      <div class="recovery-meta">
+        <span>Est. recovery<strong>${formatCurrency(item.impact)}</strong></span>
+        <span>Assigned team<strong>${item.team}</strong></span>
+        <span>SLA<strong>${item.sla}</strong></span>
+      </div>
+      <div class="recovery-actions">
+        ${item.owner
+          ? `<span class="assigned-label">Owner: ${item.owner}</span>`
+          : `<button class="secondary-btn small" data-recovery-action="assign" data-case-id="${item.id}">Assign to me</button>`}
+        ${item.status !== 'Resolved'
+          ? `<button class="primary-btn small" data-recovery-action="resolve" data-case-id="${item.id}">Mark resolved</button>`
+          : '<span class="assigned-label">Recovery confirmed</span>'}
+      </div>
+    </article>
+  `).join('');
+
+  queue.querySelectorAll('[data-recovery-action]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const recoveryCase = recoveryCases.find((item) => item.id === button.dataset.caseId);
+      if (!recoveryCase) return;
+
+      if (button.dataset.recoveryAction === 'assign') {
+        recoveryCase.owner = 'You';
+        recoveryCase.status = 'In progress';
+        toast(`${recoveryCase.id} assigned to you · ${recoveryCase.team} notified`);
+      } else {
+        recoveryCase.owner = recoveryCase.owner || 'You';
+        recoveryCase.status = 'Resolved';
+        recoveryCase.sla = 'Met';
+        toast(`${formatCurrency(recoveryCase.impact)} recovery confirmed for ${recoveryCase.customer}`);
+      }
+      renderRecoveryQueue();
+    });
+  });
+}
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+let toastTimer;
+function toast(message) {
+  const notification = document.getElementById('toast');
+  notification.textContent = message;
+  notification.classList.add('visible');
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => notification.classList.remove('visible'), 3200);
+}
+
+function navigateTo(targetId, navButton) {
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nav-link').forEach((button) => {
+    button.classList.toggle('active', button === navButton);
+    if (button === navButton) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+}
+
+function exportLeakageCsv() {
+  const columns = ['Leak', 'Financial impact', 'Confidence', 'Status', 'Responsible organization', 'Root cause'];
+  const rows = leakData.map((item) => [
+    item.title,
+    item.impact,
+    item.confidence,
+    item.status,
+    item.org,
+    item.root
+  ]);
+  const csv = [columns, ...rows]
+    .map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(','))
+    .join('\r\n');
+  const file = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(file);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = 'revenue-leakage-dashboard.csv';
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+  toast('Dashboard exported as revenue-leakage-dashboard.csv');
+}
+
+function openPlaybook() {
+  const content = document.getElementById('playbookContent');
+  content.innerHTML = agentData.map((agent, index) => `
+    <article class="playbook-step">
+      <span class="playbook-step-number">${String(index + 1).padStart(2, '0')}</span>
+      <div>
+        <h3>${agent.icon} ${agent.name}</h3>
+        <p>${agent.description}</p>
+        <span class="playbook-output">${index === 0 ? 'Output: scored leak signal' : index === 1 ? 'Output: evidence-backed root cause' : index === 2 ? 'Output: prioritized recovery estimate' : index === 3 ? 'Output: assigned, trackable work item' : 'Output: executive impact briefing'}</span>
+      </div>
+    </article>
+  `).join('');
+  document.getElementById('playbookDialog').showModal();
+}
+
 const themeToggle = document.getElementById('themeToggle');
 const demoToggle = document.getElementById('demoToggle');
 const walkthrough = document.getElementById('walkthroughSection');
+const playbookDialog = document.getElementById('playbookDialog');
 
 themeToggle.addEventListener('click', () => {
   const currentTheme = document.body.dataset.theme;
@@ -340,11 +480,37 @@ themeToggle.addEventListener('click', () => {
 });
 
 demoToggle.addEventListener('click', () => {
-  walkthrough.classList.toggle('hidden');
-  walkthrough.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const opening = walkthrough.classList.contains('hidden');
+  walkthrough.classList.toggle('hidden', !opening);
+  demoToggle.setAttribute('aria-expanded', String(opening));
+  demoToggle.textContent = opening ? 'Hide Executive Demo Walkthrough' : 'Executive Demo Walkthrough';
+  if (opening) walkthrough.scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
+
+document.querySelectorAll('.nav-link').forEach((button) => {
+  button.addEventListener('click', () => navigateTo(button.dataset.target, button));
+});
+
+document.getElementById('launchOperations').addEventListener('click', () => {
+  const firstCriticalIndex = leakData.findIndex((item) => item.status === 'critical');
+  const criticalRow = document.querySelector(`#leakTableBody tr[data-index="${firstCriticalIndex}"]`);
+  criticalRow?.click();
+  navigateTo('leakageDashboard', document.querySelector('.nav-link[data-target="leakageDashboard"]'));
+  toast('Operations view ready · highest-priority leak selected');
+});
+
+document.querySelectorAll('.playbook-trigger').forEach((button) => {
+  button.addEventListener('click', openPlaybook);
+});
+
+document.getElementById('closePlaybook').addEventListener('click', () => playbookDialog.close());
+playbookDialog.addEventListener('click', (event) => {
+  if (event.target === playbookDialog) playbookDialog.close();
+});
+document.getElementById('exportView').addEventListener('click', exportLeakageCsv);
 
 renderAgents();
 renderLeakTable();
 renderScenarioTiles();
 renderTechnologyStack();
+renderRecoveryQueue();
