@@ -84,6 +84,30 @@ const leakData = [
     cycleTime: '1.6 days',
     root: 'Invoice reconciliation failure',
     evidence: ['Contract signed', 'Inventory active', 'Invoice output missing services']
+  },
+  {
+    title: 'Roaming Promo Not Applied',
+    impact: '$186K',
+    confidence: '97%',
+    status: 'critical',
+    org: 'Billing Ops',
+    summary: 'Eligible roaming customers were charged standard pay-as-you-go rates because the purchased travel pass was not applied by the rating rule.',
+    score: '95',
+    cycleTime: '2.1 days',
+    root: 'Promo rating code mismatch',
+    evidence: ['Travel pass active', 'Roaming sessions recorded', 'Pay-as-you-go rate applied']
+  },
+  {
+    title: 'Partner Settlement Discrepancy',
+    impact: '$640K',
+    confidence: '93%',
+    status: 'watch',
+    org: 'Partner Finance',
+    summary: 'Roaming partner settlement records do not match contract rates and mediation usage, leaving a disputed revenue variance.',
+    score: '89',
+    cycleTime: '5.4 days',
+    root: 'Settlement rate table drift',
+    evidence: ['Partner statement received', 'Mediation usage reconciled', 'Rate table variance identified']
   }
 ];
 
@@ -111,6 +135,328 @@ const recoveryCases = [
   { id: 'RC-1029', issue: 'Mobile provisioning drift', customer: 'Pinecrest Wireless', impact: 96000, team: 'Network Ops', sla: 'At risk', status: 'Ready to assign', owner: '' },
   { id: 'RC-1016', issue: 'Expired discount recovery', customer: '7,420 consumer accounts', impact: 890000, team: 'Product', sla: 'Resolved', status: 'Resolved', owner: 'A. Patel' }
 ];
+
+const scenarioWalkthroughs = {
+  2: {
+    label: 'Unbilled fiber service',
+    approvalPrompt: 'Review the proposed 90-day, $450K billing adjustment. Nothing is sent to Billing Operations until you approve.',
+    approvalAction: 'Approve remediation',
+    rejectionMessage: 'Remediation was rejected. No recovery work item was created.',
+    completionMessage: 'Walkthrough complete. The approved recovery is now visible in the Recovery Center below.',
+    leakTitle: 'Unbilled Fiber Service',
+    case: {
+      id: 'SC-2001',
+      issue: 'Northstar fiber billing correction',
+      customer: 'Northstar Health Group',
+      impact: 450000,
+      team: 'Billing Ops'
+    },
+    steps: [
+      {
+        agent: 'Revenue Leakage Detection Agent',
+        icon: '🤖',
+        action: 'Scan service and billing events',
+        result: 'Active fiber service detected with no matching billing account or recurring charge.',
+        evidence: ['Order OS-78421 complete', 'Network activation EVT-99108 successful', 'No billing start event']
+      },
+      {
+        agent: 'Investigation Agent',
+        icon: '🔎',
+        action: 'Correlate the customer timeline',
+        result: 'The order-to-activation handoff succeeded, but the billing event was dropped during account migration.',
+        evidence: ['CRM: Northstar Health Group', 'Network inventory: service active since Apr 01', 'Billing: no service instance found']
+      },
+      {
+        agent: 'Revenue Recovery Agent',
+        icon: '💰',
+        action: 'Prepare a recovery recommendation',
+        result: 'Estimated exposure is $1.8M annualized. The proposed initial adjustment is $450K for the validated 90-day period.',
+        evidence: ['Annualized exposure: $1.8M', 'Validated recovery window: 90 days', 'Confidence: 96%']
+      },
+      {
+        agent: 'Remediation Orchestration Agent',
+        icon: '🧭',
+        action: 'Create an approved billing correction',
+        result: 'Billing Operations receives a prioritized work item to establish recurring billing and review the $450K adjustment.',
+        evidence: ['Billing trigger repair', '90-day adjustment review', 'SLA: 72 hours']
+      },
+      {
+        agent: 'Executive Intelligence Agent',
+        icon: '📈',
+        action: 'Publish the case outcome',
+        result: 'The case is tracked in the recovery queue with an auditable approval, estimated value, accountable team, and SLA.',
+        evidence: ['Recovery opportunity: $450K', 'Owner: Billing Operations', 'Annualized exposure remains under monitoring']
+      }
+    ]
+  },
+  3: {
+    label: 'mobile provisioning failure',
+    approvalPrompt: 'Approve a $320K service-rating correction for the validated premium-plan usage and the provisioning profile repair. No account changes or billing adjustments are applied until you approve.',
+    approvalAction: 'Approve rating correction',
+    rejectionMessage: 'The rating correction was rejected. No account changes or adjustments were made.',
+    completionMessage: 'Walkthrough complete. The approved mobile rating correction is now tracked in the Recovery Center.',
+    leakTitle: 'Mobile Provisioning Drift',
+    case: {
+      id: 'SC-2003',
+      issue: 'Premium mobile rating correction',
+      customer: '1,240 premium mobile accounts',
+      impact: 320000,
+      team: 'Network Ops'
+    },
+    steps: [
+      {
+        agent: 'Revenue Leakage Detection Agent',
+        icon: '🤖',
+        action: 'Compare purchased plans to billed tiers',
+        result: 'Premium plan orders are paired with lower-tier billing records after incomplete provisioning updates.',
+        evidence: ['1,240 premium plan orders', 'Billing profile: standard tier', 'Estimated exposure: $1.2M']
+      },
+      {
+        agent: 'Investigation Agent',
+        icon: '🔎',
+        action: 'Trace the order and provisioning handoff',
+        result: 'The order was accepted, but the premium feature activation acknowledgement did not reach the billing profile service.',
+        evidence: ['Order OMS-402918: premium plan', 'Provisioning: feature activation incomplete', 'Billing catalog: standard tier retained']
+      },
+      {
+        agent: 'Revenue Recovery Agent',
+        icon: '💰',
+        action: 'Validate the rating adjustment',
+        result: 'The agent reconciles usage and contracts to estimate $320K in eligible undercharges, separately from the $1.2M annualized exposure.',
+        evidence: ['Validated adjustment: $320K', 'Usage and entitlement matched', 'Confidence: 94%']
+      },
+      {
+        agent: 'Remediation Orchestration Agent',
+        icon: '🧭',
+        action: 'Prepare the profile repair',
+        result: 'Network Operations prepares the missing provisioning update and a billing review for verified premium usage.',
+        evidence: ['Repair premium feature profile', 'Review validated usage adjustments', 'SLA: 72 hours']
+      },
+      {
+        agent: 'Executive Intelligence Agent',
+        icon: '📈',
+        action: 'Publish the service impact',
+        result: 'The incident is tracked with affected accounts, approved adjustment, team ownership, and provisioning root cause.',
+        evidence: ['1,240 accounts monitored', 'Recovery opportunity: $320K', 'Provisioning mismatch trend tracked']
+      }
+    ]
+  },
+  4: {
+    label: 'discount misconfiguration',
+    approvalPrompt: 'Approve the $890K annualized exposure case and forward-looking discount-rule correction for 7,420 accounts. The proposal does not back-bill customers; eligibility and customer communication are reviewed first.',
+    approvalAction: 'Approve discount correction',
+    rejectionMessage: 'The discount correction was rejected. No customer pricing or discount rules were changed.',
+    completionMessage: 'Walkthrough complete. The approved discount eligibility review is now tracked in the Recovery Center.',
+    leakTitle: 'Discount Misconfiguration',
+    case: {
+      id: 'SC-2004',
+      issue: 'Expired promotion eligibility correction',
+      customer: '7,420 promotional accounts',
+      impact: 890000,
+      team: 'Product'
+    },
+    steps: [
+      {
+        agent: 'Revenue Leakage Detection Agent',
+        icon: '🤖',
+        action: 'Check promotion end dates against billing',
+        result: 'The agent finds promotional discounts still applied after their offer windows closed.',
+        evidence: ['7,420 accounts beyond offer end date', 'Discount still present on invoices', 'Annualized exposure: $890K']
+      },
+      {
+        agent: 'Investigation Agent',
+        icon: '🔎',
+        action: 'Inspect the offer eligibility rule',
+        result: 'A campaign migration left the expiration event unset for one promotion cohort; the customer contracts and original offer terms are verified.',
+        evidence: ['Campaign: SPRING-24-MIGRATED', 'Expiration event: missing', 'Offer terms and account eligibility matched']
+      },
+      {
+        agent: 'Revenue Recovery Agent',
+        icon: '💰',
+        action: 'Quantify forward-looking exposure',
+        result: 'The agent estimates $890K annualized exposure and recommends ending only verified expired discounts, with no retrospective customer charges.',
+        evidence: ['Annualized exposure: $890K', 'Eligible cohort: 7,420 accounts', 'Back-billing: excluded']
+      },
+      {
+        agent: 'Remediation Orchestration Agent',
+        icon: '🧭',
+        action: 'Prepare a reviewed offer-rule change',
+        result: 'Product prepares the corrected expiration rule and a customer-care communication plan for human review before the next bill cycle.',
+        evidence: ['Correct future offer expiration', 'Customer-care notice review', 'SLA: next bill cycle']
+      },
+      {
+        agent: 'Executive Intelligence Agent',
+        icon: '📈',
+        action: 'Publish the exposure and guardrails',
+        result: 'Leadership sees the projected recurring exposure, affected population, customer protection guardrails, and decision audit trail.',
+        evidence: ['7,420 accounts under review', 'Annualized exposure: $890K', 'Customer back-billing prohibited']
+      }
+    ]
+  },
+  5: {
+    label: 'enterprise billing error',
+    approvalPrompt: 'Approve a $600K catch-up invoice proposal for nine circuits verified against Meridian Logistics’ signed contract and service inventory. No invoice is issued until Finance approves.',
+    approvalAction: 'Approve invoice proposal',
+    rejectionMessage: 'The invoice proposal was rejected. No customer invoice or billing change was issued.',
+    completionMessage: 'Walkthrough complete. The approved enterprise invoice review is now tracked in the Recovery Center.',
+    leakTitle: 'Enterprise Invoice Gap',
+    case: {
+      id: 'SC-2005',
+      issue: 'Meridian Logistics circuit invoice review',
+      customer: 'Meridian Logistics · 9 active circuits',
+      impact: 600000,
+      team: 'Finance'
+    },
+    steps: [
+      {
+        agent: 'Revenue Leakage Detection Agent',
+        icon: '🤖',
+        action: 'Compare enterprise inventory to invoices',
+        result: 'Nine active customer circuits appear in network inventory but are missing from recent invoice line items.',
+        evidence: ['9 active circuits', 'No matching recurring invoice lines', 'Portfolio exposure: $2.4M']
+      },
+      {
+        agent: 'Investigation Agent',
+        icon: '🔎',
+        action: 'Match contract, inventory, and billing records',
+        result: 'Each circuit maps to a signed contract and active service; an account migration caused invoice account codes to diverge.',
+        evidence: ['Contract: MLG-ENT-8841', 'Network inventory: all 9 circuits active', 'Billing account mapping: stale']
+      },
+      {
+        agent: 'Revenue Recovery Agent',
+        icon: '💰',
+        action: 'Calculate the verified invoice proposal',
+        result: 'The agent calculates $600K in a 90-day catch-up estimate, subject to contract-rate and customer-account reconciliation.',
+        evidence: ['Proposed 90-day amount: $600K', 'Contract rates matched', 'Confidence: 98%']
+      },
+      {
+        agent: 'Remediation Orchestration Agent',
+        icon: '🧭',
+        action: 'Route the invoice for Finance approval',
+        result: 'Finance receives an itemized draft with circuit references and contract evidence; invoice release remains on hold.',
+        evidence: ['9 itemized circuit lines', 'Contract evidence attached', 'Invoice hold until approval']
+      },
+      {
+        agent: 'Executive Intelligence Agent',
+        icon: '📈',
+        action: 'Report enterprise exposure and decision',
+        result: 'The enterprise exposure and proposed catch-up amount appear in the recovery view with Finance ownership and approval status.',
+        evidence: ['Portfolio exposure: $2.4M', 'Invoice proposal: $600K', 'Customer billing approval recorded']
+      }
+    ]
+  },
+  6: {
+    label: 'partner settlement discrepancy',
+    approvalPrompt: 'Approve a $214K settlement dispute for the validated roaming rate variance. The partner claim is only prepared for review; no payment or settlement record is changed until you approve.',
+    approvalAction: 'Approve settlement dispute',
+    rejectionMessage: 'The settlement dispute was rejected. No partner claim or settlement adjustment was submitted.',
+    completionMessage: 'Walkthrough complete. The approved partner dispute is now tracked in the Recovery Center.',
+    leakTitle: 'Partner Settlement Discrepancy',
+    case: {
+      id: 'SC-2006',
+      issue: 'Atlantic Mobile roaming settlement dispute',
+      customer: 'Atlantic Mobile · roaming partner',
+      impact: 214000,
+      team: 'Partner Finance'
+    },
+    steps: [
+      {
+        agent: 'Revenue Leakage Detection Agent',
+        icon: '🤖',
+        action: 'Compare partner statements to expected rates',
+        result: 'Settlement charges diverge from expected contract rates for roaming traffic recorded in the same period.',
+        evidence: ['Statement variance: $640K', 'Period: May settlement', 'Partner: Atlantic Mobile']
+      },
+      {
+        agent: 'Investigation Agent',
+        icon: '🔎',
+        action: 'Reconcile usage, contract, and settlement',
+        result: 'Mediation usage matches, but the partner statement applied a superseded rate table to a subset of roaming destinations.',
+        evidence: ['Mediation records reconciled', 'Contract rate schedule: current', 'Statement rate table: superseded']
+      },
+      {
+        agent: 'Revenue Recovery Agent',
+        icon: '💰',
+        action: 'Validate the dispute amount',
+        result: 'The agent isolates $214K of supported variance for dispute and separates it from the larger $640K statement exposure pending further reconciliation.',
+        evidence: ['Supported dispute: $214K', 'Remaining variance: under review', 'Confidence: 93%']
+      },
+      {
+        agent: 'Remediation Orchestration Agent',
+        icon: '🧭',
+        action: 'Prepare an evidence-backed partner claim',
+        result: 'Partner Finance prepares a dispute packet with contract clauses, usage records, and the corrected rate table for authorized review.',
+        evidence: ['Contract and usage evidence attached', 'Partner claim: draft only', 'SLA: 5 business days']
+      },
+      {
+        agent: 'Executive Intelligence Agent',
+        icon: '📈',
+        action: 'Publish settlement recovery progress',
+        result: 'The $214K proposed dispute and remaining $426K reconciliation are reported separately with owners and settlement status.',
+        evidence: ['$214K supported dispute', '$426K remains under review', 'No settlement action before approval']
+      }
+    ]
+  },
+  9: {
+    label: 'Roaming promo package',
+    approvalPrompt: 'Approve $186K in customer billing credits and a rating-rule correction. No credits or configuration changes happen without your approval.',
+    approvalAction: 'Approve credits & rule fix',
+    rejectionMessage: 'The proposed credits and rating-rule change were rejected. No customer adjustments or billing changes were made.',
+    completionMessage: 'Walkthrough complete. The approved promo correction is now tracked in the Recovery Center.',
+    leakTitle: 'Roaming Promo Not Applied',
+    case: {
+      id: 'SC-2009',
+      issue: 'Roaming promo billing correction',
+      customer: '312 eligible roaming customers',
+      impact: 186000,
+      team: 'Billing Ops'
+    },
+    steps: [
+      {
+        agent: 'Revenue Leakage Detection Agent',
+        icon: '🤖',
+        action: 'Compare roaming passes to rated sessions',
+        result: 'The agent finds eligible travel passes that were active while roaming sessions were charged at standard pay-as-you-go rates.',
+        evidence: ['312 customers affected', '1,284 roaming days reviewed', 'Estimated billing variance: $186K']
+      },
+      {
+        agent: 'Investigation Agent',
+        icon: '🔎',
+        action: 'Trace the offer through billing',
+        result: 'Customers purchased the Roam Easy Day Pass, but the rating rule mapped their sessions to the default retail roaming tariff.',
+        evidence: ['Offer catalog: ROAM-EU-12 active', 'Customer subscriptions: pass attached', 'Rated events: PAYG-ROAM tariff']
+      },
+      {
+        agent: 'Revenue Recovery Agent',
+        icon: '💰',
+        action: 'Calculate customer adjustment exposure',
+        result: 'The mismatch affected 312 customers. The recommended $186K represents the validated difference between pass pricing and posted roaming charges.',
+        evidence: ['Proposed customer credits: $186K', 'Affected accounts: 312', 'Confidence: 97%']
+      },
+      {
+        agent: 'Remediation Orchestration Agent',
+        icon: '🧭',
+        action: 'Prepare the rating fix and credit batch',
+        result: 'Billing Operations prepares a corrected promo mapping and a reviewable credit batch; neither is applied until a human approves.',
+        evidence: ['Correct promo-to-rating mapping', 'Credit batch for 312 accounts', 'SLA: 48 hours']
+      },
+      {
+        agent: 'Executive Intelligence Agent',
+        icon: '📈',
+        action: 'Publish the customer and revenue impact',
+        result: 'The incident, approval decision, affected customers, and adjustment value are added to the executive recovery view.',
+        evidence: ['Adjustment under review: $186K', 'Customer impact: 312 accounts', 'Control: approval required before billing changes']
+      }
+    ]
+  }
+};
+
+const walkthroughStates = Object.fromEntries(
+  Object.keys(scenarioWalkthroughs).map((scenarioId) => [
+    scenarioId,
+    { completedSteps: [], approval: 'pending' }
+  ])
+);
 
 const scenarios = [
   {
@@ -208,6 +554,18 @@ const scenarios = [
       { label: 'Faster triage', value: '62%' },
       { label: 'Cost savings', value: '$3.1M' }
     ]
+  },
+  {
+    id: 9,
+    title: 'Roaming Promo Not Applied',
+    short: 'Purchased travel pass missed by billing',
+    summary: 'Customers bought an eligible roaming promo package, but billing rated their roaming usage at standard pay-as-you-go rates instead of applying the package.',
+    metrics: [
+      { label: 'Proposed credits', value: '$186K' },
+      { label: 'Customers affected', value: '312' },
+      { label: 'Sessions reviewed', value: '1,284' },
+      { label: 'Detection confidence', value: '97%' }
+    ]
   }
 ];
 
@@ -303,7 +661,7 @@ function renderLeakDetail(item) {
 function renderScenarioTiles() {
   const container = document.getElementById('scenarioTiles');
   container.innerHTML = scenarios.map((scenario, index) => `
-    <button class="scenario-tile ${index === 0 ? 'active' : ''}" data-index="${index}">
+    <button class="scenario-tile ${index === 1 ? 'active' : ''}" data-index="${index}">
       <strong>Tile ${scenario.id}</strong>
       <small>${scenario.short}</small>
     </button>
@@ -318,7 +676,7 @@ function renderScenarioTiles() {
     });
   });
 
-  renderScenarioDetail(scenarios[0]);
+  renderScenarioDetail(scenarios[1]);
 }
 
 function renderScenarioDetail(item) {
@@ -337,7 +695,122 @@ function renderScenarioDetail(item) {
         </div>
       `).join('')}
     </div>
+    ${scenarioWalkthroughs[item.id] ? '<section id="scenarioWalkthrough" class="fiber-walkthrough" aria-live="polite"></section>' : ''}
   `;
+  if (scenarioWalkthroughs[item.id]) renderScenarioWalkthrough(item.id);
+}
+
+function renderScenarioWalkthrough(scenarioId) {
+  const container = document.getElementById('scenarioWalkthrough');
+  if (!container) return;
+
+  const config = scenarioWalkthroughs[scenarioId];
+  const state = walkthroughStates[scenarioId];
+  const { completedSteps, approval } = state;
+  const { steps } = config;
+  const awaitingApproval = completedSteps.length === 3 && approval === 'pending';
+  const declined = approval === 'rejected';
+  const finished = completedSteps.length === steps.length;
+  const activeIndex = completedSteps.length;
+
+  container.innerHTML = `
+    <div class="fiber-walkthrough-heading">
+      <div>
+        <span class="section-kicker">Interactive agent walkthrough</span>
+        <h5>Follow the ${config.label} case from signal to approved action</h5>
+        <p>Advance each agent yourself. The proposed remediation pauses for your approval before billing work is created.</p>
+      </div>
+      <button type="button" class="secondary-btn small" data-walkthrough-action="reset">
+        ${completedSteps.length || approval !== 'pending' ? 'Restart walkthrough' : 'Reset'}
+      </button>
+    </div>
+    <ol class="agent-timeline">
+      ${steps.map((step, index) => {
+        const isComplete = completedSteps.includes(index);
+        const isActive = index === activeIndex && !awaitingApproval && !declined && !finished;
+        const isLocked = !isComplete && !isActive;
+        const result = isComplete
+          ? `<p class="agent-result">${step.result}</p>
+             <div class="evidence-chips">${step.evidence.map((evidence) => `<span>${evidence}</span>`).join('')}</div>`
+          : '';
+        const control = isActive
+          ? `<button type="button" class="primary-btn small" data-walkthrough-action="run-step" data-step="${index}">${step.action}</button>`
+          : `<span class="timeline-state">${isComplete ? 'Completed' : isLocked ? 'Waiting' : 'Ready'}</span>`;
+        return `
+          <li class="agent-timeline-step ${isComplete ? 'complete' : ''} ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}">
+            <span class="timeline-icon" aria-hidden="true">${step.icon}</span>
+            <div class="timeline-body">
+              <div class="timeline-title-row"><strong>${step.agent}</strong>${control}</div>
+              ${result}
+            </div>
+          </li>
+        `;
+      }).join('')}
+    </ol>
+    ${awaitingApproval ? `
+      <div class="human-approval">
+        <div class="approval-heading"><span aria-hidden="true">✋</span><div><strong>Human approval required</strong><p>${config.approvalPrompt}</p></div></div>
+        <div class="approval-controls">
+          <button type="button" class="primary-btn small" data-walkthrough-action="approve">${config.approvalAction}</button>
+          <button type="button" class="secondary-btn small" data-walkthrough-action="reject">Reject and stop</button>
+        </div>
+      </div>
+    ` : ''}
+    ${declined ? `<p class="walkthrough-outcome declined" role="status">${config.rejectionMessage}</p>` : ''}
+    ${finished ? `<p class="walkthrough-outcome completed" role="status">${config.completionMessage}</p>` : ''}
+    <p class="demo-disclaimer">Demo simulation using sample data; actions do not connect to or change live billing systems.</p>
+  `;
+
+  container.querySelectorAll('[data-walkthrough-action]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const { walkthroughAction, step } = button.dataset;
+      if (walkthroughAction === 'reset') {
+        state.completedSteps = [];
+        state.approval = 'pending';
+      } else if (walkthroughAction === 'run-step') {
+        completeScenarioStep(scenarioId, Number(step));
+      } else if (walkthroughAction === 'approve') {
+        approveScenarioRemediation(scenarioId);
+      } else if (walkthroughAction === 'reject') {
+        state.approval = 'rejected';
+        toast('Remediation rejected · no changes made');
+      }
+      renderScenarioWalkthrough(scenarioId);
+    });
+  });
+}
+
+function completeScenarioStep(scenarioId, stepIndex) {
+  const state = walkthroughStates[scenarioId];
+  const { steps } = scenarioWalkthroughs[scenarioId];
+  if (stepIndex !== state.completedSteps.length) return;
+  if (stepIndex >= 3 && state.approval !== 'approved') return;
+  state.completedSteps.push(stepIndex);
+  toast(`${steps[stepIndex].agent} completed its step`);
+}
+
+function approveScenarioRemediation(scenarioId) {
+  const config = scenarioWalkthroughs[scenarioId];
+  const state = walkthroughStates[scenarioId];
+  if (state.completedSteps.length !== 3 || state.approval !== 'pending') return;
+
+  state.approval = 'approved';
+  state.completedSteps.push(3);
+  const existingCase = recoveryCases.find((item) => item.id === config.case.id);
+  if (!existingCase) {
+    recoveryCases.unshift({
+      ...config.case,
+      sla: '72h remaining',
+      status: 'In progress',
+      owner: config.case.team
+    });
+  }
+
+  const relatedLeak = leakData.find((item) => item.title === config.leakTitle);
+  if (relatedLeak) relatedLeak.status = 'recovering';
+  renderLeakTable();
+  renderRecoveryQueue();
+  toast(`Approved · billing remediation work item ${config.case.id} created`);
 }
 
 function renderTechnologyStack() {
