@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Revenue Leakage Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo">RL</div>
+          <div class="brand-copy">
+            <span class="eyebrow">RevenueLeakAI</span>
+            <h1>Revenue Leakage Command Center</h1>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-link active">Executive</button>
+          <button class="nav-link">Dashboard</button>
+          <button class="nav-link">Investigations</button>
+          <button class="nav-link">Recovery</button>
+          <button class="nav-link">Architecture</button>
+        </nav>
+
+        <div class="top-actions">
+          <button id="themeToggle" class="secondary-btn" aria-label="Toggle theme">Light mode</button>
+          <button id="demoToggle" class="primary-btn">Executive Demo Walkthrough</button>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero panel">
+          <div class="hero-copy">
+            <span class="kicker">AI-powered telecom revenue assurance</span>
+            <h2>Protecting revenue before it leaks.</h2>
+            <p>
+              Continuously detect, investigate, and recover lost revenue across billing,
+              network, partner, and customer operations with a collaborative AI command center.
+            </p>
+            <div class="hero-actions">
+              <button class="primary-btn">Launch operations</button>
+              <button class="secondary-btn">Review AI playbook</button>
+            </div>
+            <div class="hero-summary" aria-label="Financial summary">
+              <div>
+                <span class="summary-label">Revenue at risk</span>
+                <strong>$18.4M</strong>
+              </div>
+              <div>
+                <span class="summary-label">Recovered</span>
+                <strong>$7.1M</strong>
+              </div>
+              <div>
+                <span class="summary-label">Recovery rate</span>
+                <strong>38.6%</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual" aria-label="Executive KPI visual">
+            <div class="radial-ring">
+              <div class="ring-inner">
+                <span>Leakage Risk</span>
+                <strong>14.2%</strong>
+              </div>
+            </div>
+            <div class="mini-stack">
+              <div class="mini-card">
+                <span>Open investigations</span>
+                <strong>184</strong>
+              </div>
+              <div class="mini-card success">
+                <span>Financial impact reduced</span>
+                <strong>-22.4%</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="kpi-grid" aria-label="Key performance indicators">
+          <article class="panel kpi-card">
+            <div class="kpi-header">
+              <span>Revenue currently at risk</span>
+              <span class="trend up">+6.8%</span>
+            </div>
+            <h3>$18.4M</h3>
+            <div class="mini-bars">
+              <span style="height: 34%"></span>
+              <span style="height: 52%"></span>
+              <span style="height: 61%"></span>
+              <span style="height: 74%"></span>
+              <span style="height: 68%"></span>
+              <span style="height: 84%"></span>
+            </div>
+          </article>
+
+          <article class="panel kpi-card">
+            <div class="kpi-header">
+              <span>Revenue recovered</span>
+              <span class="trend up">+11.2%</span>
+            </div>
+            <h3>$7.1M</h3>
+            <div class="mini-bars">
+              <span style="height: 26%"></span>
+              <span style="height: 44%"></span>
+              <span style="height: 59%"></span>
+              <span style="height: 66%"></span>
+              <span style="height: 76%"></span>
+              <span style="height: 86%"></span>
+            </div>
+          </article>
+
+          <article class="panel kpi-card">
+            <div class="kpi-header">
+              <span>High-priority leaks</span>
+              <span class="trend down">-9.1%</span>
+            </div>
+            <h3>42</h3>
+            <div class="mini-bars">
+              <span style="height: 58%"></span>
+              <span style="height: 63%"></span>
+              <span style="height: 48%"></span>
+              <span style="height: 72%"></span>
+              <span style="height: 56%"></span>
+              <span style="height: 41%"></span>
+            </div>
+          </article>
+
+          <article class="panel kpi-card">
+            <div class="kpi-header">
+              <span>Resolution trend</span>
+              <span class="trend up">+28d</span>
+            </div>
+            <h3>72.9%</h3>
+            <div class="mini-bars">
+              <span style="height: 42%"></span>
+              <span style="height: 56%"></span>
+              <span style="height: 58%"></span>
+              <span style="height: 70%"></span>
+              <span style="height: 82%"></span>
+              <span style="height: 96%"></span>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel section-header">
+          <div>
+            <span class="section-kicker">AI agents</span>
+            <h3>Five collaborative revenue intelligence agents</h3>
+          </div>
+          <button class="secondary-btn small">View agent playbook</button>
+        </section>
+
+        <section id="agentGrid" class="agent-grid" aria-live="polite"></section>
+
+        <section class="two-column-layout dashboard-layout">
+          <div class="panel">
+            <div class="panel-heading">
+              <div>
+                <span class="section-kicker">Live monitoring</span>
+                <h3>Revenue Leakage Dashboard</h3>
+              </div>
+              <button class="ghost-btn">Export view</button>
+            </div>
+
+            <table class="leak-table">
+              <thead>
+                <tr>
+                  <th>Leak</th>
+                  <th>Impact</th>
+                  <th>Confidence</th>
+                  <th>Status</th>
+                  <th>Org</th>
+                </tr>
+              </thead>
+              <tbody id="leakTableBody"></tbody>
+            </table>
+          </div>
+
+          <aside class="panel detail-panel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="section-kicker">Investigation</span>
+                <h3>Leak detail</h3>
+              </div>
+            </div>
+            <div id="leakDetails" class="leak-details"></div>
+          </aside>
+        </section>
+
+        <section id="walkthroughSection" class="panel walkthrough hidden">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">Executive Demo Walkthrough</span>
+              <h3>AI-guided scenario exploration</h3>
+            </div>
+          </div>
+
+          <div class="scenario-grid" id="scenarioTiles" aria-live="polite"></div>
+
+          <div id="scenarioDetail" class="scenario-detail" aria-live="polite"></div>
+        </section>
+
+        <section class="panel architecture-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">Solution architecture</span>
+              <h3>Data flows from source systems to executive dashboards</h3>
+            </div>
+          </div>
+
+          <div class="architecture-flow" aria-label="Architecture flow">
+            <div class="flow-box">CRM</div>
+            <div class="flow-box">Billing</div>
+            <div class="flow-box">ERP</div>
+            <div class="flow-box">Network</div>
+            <div class="flow-box highlight">Detection Agent</div>
+            <div class="flow-box">Investigation</div>
+            <div class="flow-box">Recovery</div>
+            <div class="flow-box">Remediation</div>
+            <div class="flow-box highlight">Executive Intelligence</div>
+            <div class="flow-box">Dashboards</div>
+          </div>
+        </section>
+
+        <section class="data-stack-grid">
+          <div class="panel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="section-kicker">Data sources</span>
+                <h3>Unified telecom intelligence</h3>
+              </div>
+            </div>
+            <div class="source-grid">
+              <span>CRM</span>
+              <span>Billing</span>
+              <span>Product catalog</span>
+              <span>Order management</span>
+              <span>Network inventory</span>
+              <span>Provisioning</span>
+              <span>Mediation</span>
+              <span>Revenue management</span>
+              <span>ERP</span>
+              <span>Customer support</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="section-kicker">Technology stack</span>
+                <h3>Microsoft platform foundation</h3>
+              </div>
+            </div>
+            <div id="techStack" class="tech-stack" aria-live="polite"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
